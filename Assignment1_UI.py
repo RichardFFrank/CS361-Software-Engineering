@@ -7,31 +7,39 @@ from time import sleep
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~ FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # click event for UI button
 def generate_pokemon(label):
-    # run the number generator and the image service to genrate a random number and populate a path for a pokemon.
-    with open('ui_start_command.txt', 'w') as start:
+    # add "RUN" to the prng_service file to tell PRNG to return a random number
+    with open('prng-service.txt', 'w') as start:
         start.write("RUN\n")
     start.close()
-    sleep(3)
-    # os.system('python3 PRNG.py')
-    # os.system('python3 image_service.py')
-    # read the img_handler file to determine the path of the pokemon photo for use by the UI.
-    if os.path.exists('image-service.txt'):
-        with open('image-service.txt', 'r') as pipe:
-            command =  pipe.readline()
-            if command == "RUN\n":
-                image_file = pipe.readline()
-            else:
-                return -1
-        pipe.close()
-        os.remove('image-service.txt')
+    sleep(5)
+    # read the random number from the prng_service file
+    with open('prng-service.txt', 'r+') as rand_file:
+        rand_num = rand_file.readline()
+        sleep(3)
+        rand_file.truncate(0)
+    rand_file.close()
+
+    # write the random number to the image service file
+    with open('image-service.txt', 'w') as image:
+            image.truncate(0)
+            image.write("RUN\n")
+            image.write(str(rand_num))
+    image.close()
+    sleep(5)
+
+    with open('image-service.txt', 'r+') as ret_image:
+        image_file =ret_image.readline()
+        ret_image.truncate(0)
+    ret_image.close()
+    sleep(5)
     # build the path based on the current working directory.
-        path = os.getcwd()
-        path = path+image_file
+    path = os.getcwd()
+    path = path+image_file
         # generate the new image and update the label.
-        new_img = ImageTk.PhotoImage(Image.open(path))
-    else:
-        new_img = ImageTk.PhotoImage(Image.open("question_mark.png"))
-        print("image not found")
+    new_img = ImageTk.PhotoImage(Image.open(path))
+    # else:
+    #     new_img = ImageTk.PhotoImage(Image.open("question_mark.png"))
+    #     print("image not found")
     label.configure(image=new_img)
     label.image = new_img
 

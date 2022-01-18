@@ -1,4 +1,5 @@
-import random, os, os.path, time
+import random, os, os.path
+from time import sleep
 
 def main() -> int:
     # seed the random value, default uses current time.
@@ -6,21 +7,21 @@ def main() -> int:
 
 
     while True:
-        if os.path.exists('ui_start_command.txt'):
-            with open('ui_start_command.txt', 'r') as start:
+        if os.path.exists('prng-service.txt'):
+            with open('prng-service.txt', 'r+') as start:
                 command =  start.readline()
-                if command == "RUN\n":
-                    return_value = random.randrange(1000)
-                    with open('prng-service.txt', 'w') as pipe:
-                        pipe.write("RUN\n")
-                        pipe.write(str(return_value))
-                    pipe.close()
+                if command == 'RUN\n':
+                    sleep(2)
+                    start.truncate(0)
                     start.close()
-                    os.remove('ui_start_command.txt')
+                    with open('prng-service.txt', 'w') as start:
+                        return_value = random.randrange(1000)
+                        start.write(str(return_value))
+                        start.close()
                 else:
-                    os.remove('ui_start_command.txt')
+                    sleep(5)
         else:
-            time.sleep(2)
+            sleep(2)
 
 
     
